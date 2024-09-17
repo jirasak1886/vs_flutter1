@@ -1,196 +1,198 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart'; // For TapGestureRecognizer
 import 'package:flutter_aten/controller/auth_service.dart';
 import 'package:flutter_aten/formlogin/regiter.dart';
 
-// ย้ายฟังก์ชัน _login มายังภายใน _LoginPageState class เพื่อให้สามารถเข้าถึงตัวแปรและ state ต่าง ๆ ได้
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+import 'package:flutter_aten/pages/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginScreen> {
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isLoading = false;
+  final String _errorMessage = "";
 
   void _login() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      print('Username : ${_usernameController.text}');
+      print('Password : ${_passwordController.text}');
       try {
         final user = await AuthService()
             .login(_usernameController.text, _passwordController.text);
-        if (user != null) {
-          Navigator.pushReplacementNamed(context, '/home');
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Login failed')),
-          );
-        }
-      } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: $error')),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
+      } catch (e) {
+        print(e);
       }
     }
+  }
+
+  void saveData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString("userName", _usernameController.text);
+    await prefs.setString("password", _passwordController.text);
+  }
+
+  String? userName;
+  String? password;
+
+  void getData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      userName = prefs.getString("userName");
+      password = prefs.getString("password");
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.login_rounded,
-                    size: 100,
-                  ),
-                  SizedBox(height: 25),
-                  //hello again
-                  Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 52,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  SizedBox(height: 50),
-
-                  //username text field
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(15),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text(
+                  'WELCOME',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.cyan,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 10.0,
+                        color: Colors.black45,
+                        offset: Offset(2.0, 2.0),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20.0),
-                        child: TextFormField(
-                          controller: _usernameController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Username',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your Username';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
-                  SizedBox(height: 10),
-
-                  //password text field
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(15),
+                ),
+                const SizedBox(height: 20),
+                const Icon(
+                  Icons.sailing,
+                  color: Colors.cyan,
+                  size: 120,
+                ),
+                const SizedBox(height: 40),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(12.0),
+                    boxShadow: [
+                      const BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10.0,
+                        offset: Offset(0, 4),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20.0),
-                        child: TextFormField(
-                          controller: _passwordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Password',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
-                  SizedBox(height: 10),
-
-                  //sign in button
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: GestureDetector(
-                      onTap: _isLoading
-                          ? null
-                          : _login, // เชื่อมต่อปุ่ม Sign In กับฟังก์ชัน _login
-                      child: Container(
-                        padding: EdgeInsets.all(20.0),
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple,
-                          border: Border.all(color: Colors.black),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'LOGIN',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: 25),
-
-                  //not registered yet? register now
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
                     children: [
-                      Text(
-                        'Not registered yet?',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                      TextField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          labelText: 'Username',
+                          prefixIcon: const Icon(
+                            Icons.person,
+                            color: Colors.cyan,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white70,
                         ),
                       ),
-                      RichText(
-                        text: TextSpan(
-                          text: ' Register Now',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
                           ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => RegisterScreen()),
-                              );
-                            },
+                          labelText: 'Password',
+                          prefixIcon: const Icon(
+                            Icons.lock,
+                            color: Colors.cyan,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white70,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_usernameController.text.trim().isNotEmpty &&
+                        _passwordController.text.trim().isNotEmpty) {
+                      saveData();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomePage(
+                            title: 'HomePage',
+                          ),
+                        ),
+                      );
+                    } else {
+                      if (_usernameController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Please enter your username")),
+                        );
+                      }
+                      if (_passwordController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Please enter your password")),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: Colors.cyan,
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    child: Text(
+                      'Login',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const RegisterPage()),
+                    );
+                  },
+                  child: const Text(
+                    'Create an account',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.cyan,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

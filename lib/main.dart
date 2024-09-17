@@ -1,7 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_aten/formlogin/login.dart'; // Assuming this file exists
+import 'package:flutter_aten/formlogin/login.dart';
 
-void main() => runApp(MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
-    ));
+//import 'register_page.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const LoginPage(), // เริ่มต้นที่หน้า LoginPage
+      debugShowCheckedModeBanner: false, // ปิด Debug Banner
+    );
+  }
+}

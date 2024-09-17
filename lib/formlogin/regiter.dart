@@ -1,166 +1,176 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_aten/formlogin/login.dart';
-import 'package:flutter/gestures.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  String _errorMessage = '';
+
+  void _register() {
+    final username = _usernameController.text;
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (password != confirmPassword) {
+      setState(() {
+        _errorMessage = 'Passwords do not match';
+      });
+      return;
+    }
+
+    if (username.isNotEmpty && password.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration successful!')),
+      );
+      Navigator.pop(context);
+    } else {
+      setState(() {
+        _errorMessage = 'Please fill in all fields';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    var emailController = TextEditingController();
-    var passwordController = TextEditingController();
     return Scaffold(
-        backgroundColor: Colors.grey[300],
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.app_registration_rounded,
-                    size: 100,
-                  ),
-                  SizedBox(height: 25),
-                  //hello again
-                  Text(
-                    'Register',
-                    style: TextStyle(
-                      fontSize: 52,
+      appBar: AppBar(
+        title: const Text('Register Page'),
+        backgroundColor: Colors.teal[800], // สี AppBar เป็นสีทะเลสีคราม
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Create New Account',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal[800], // สีข้อความเป็นสีทะเลสีคราม
+                  shadows: [
+                    Shadow(
+                      blurRadius: 10.0,
+                      color: Colors.black45,
+                      offset: Offset(2.0, 2.0),
                     ),
-                  ),
-
-                  SizedBox(height: 50),
-
-                  //Usernaem text field
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20.0),
-                        child: TextField(
-                          controller: emailController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Username',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-
-                  //password text field
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20.0),
-                        child: TextField(
-                          controller: passwordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Password',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  //password text field
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20.0),
-                        child: TextField(
-                          controller: passwordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'name',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  //sign in button
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: GestureDetector(
-                      child: Container(
-                        padding: EdgeInsets.all(20.0),
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple,
-                          border: Border.all(color: Colors.black),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 25),
-
-                  //not registered yet? register now
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    // ignore: prefer_const_literals_to_create_immutables
-                    children: [
-                      Text(
-                        'Already registered ?',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          text: ' Login Now',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => LoginScreen()),
-                              );
-                            },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+              const SizedBox(height: 20),
+              // ใช้ไอคอนแทนรูปภาพ
+              Icon(
+                Icons.account_circle,
+                color: Colors.teal[800], // สีไอคอนเป็นสีทะเลสีคราม
+                size: 120,
+              ),
+              const SizedBox(height: 40),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(12.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10.0,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        labelText: 'Username',
+                        prefixIcon: const Icon(
+                          Icons.person,
+                          color: Colors.teal, // สีไอคอนเป็นสีทะเลสีคราม
+                        ),
+                        filled: true,
+                        fillColor: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        labelText: 'Password',
+                        prefixIcon: const Icon(
+                          Icons.lock,
+                          color: Colors.teal, // สีไอคอนเป็นสีทะเลสีคราม
+                        ),
+                        filled: true,
+                        fillColor: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        labelText: 'Confirm Password',
+                        prefixIcon: const Icon(
+                          Icons.lock,
+                          color: Colors.teal, // สีไอคอนเป็นสีทะเลสีคราม
+                        ),
+                        filled: true,
+                        fillColor: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _register,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 15,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  backgroundColor: Colors.teal[800], // สีปุ่มเป็นสีทะเลสีคราม
+                  shadowColor: Colors.teal[800]!.withOpacity(0.5),
+                  elevation: 10.0,
+                ),
+                child: const Text(
+                  'Register',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
+              if (_errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text(
+                    _errorMessage,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                  ),
+                ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
